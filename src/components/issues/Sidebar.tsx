@@ -139,7 +139,7 @@ export default function Sidebar({ className = "", mobile = false, open = false, 
                   onClick={handleAddMenu}
                   className="w-full bg-indigo-700 text-white rounded px-2 py-1 mb-2 font-semibold"
                 >
-                  Add Menu
+                  Add Menu(Test Scroller)
                 </button>
               </>
             )}

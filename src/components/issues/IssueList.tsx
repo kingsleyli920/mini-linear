@@ -5,6 +5,9 @@ import { createClient } from '@/lib/supabase/client';
 import Modal from '@/components/common/Modal';
 import { useAuth } from '@/contexts/AuthContext';
 import { PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline';
+import IssueCard from './IssueCard';
+import IssueModal from './IssueModal';
+import ConfirmDeleteModal from './ConfirmDeleteModal';
 
 interface Issue {
   id: number | string;
@@ -139,16 +142,20 @@ export default function IssueList() {
     setEditStatus(issue.status);
   };
 
-  const handleEditSave = async () => {
+  const handleEditSave = async (
+    title: string,
+    description: string,
+    status: string
+  ) => {
     if (!editingIssue) return;
     setEditLoading(true);
     const now = new Date().toISOString();
     const { error } = await supabase
       .from('issues')
       .update({
-        title: editTitle,
-        description: editDescription,
-        status: editStatus,
+        title,
+        description,
+        status,
         updated_at: now,
       })
       .eq('id', editingIssue.id);
@@ -159,9 +166,9 @@ export default function IssueList() {
           i.id === editingIssue.id
             ? {
                 ...i,
-                title: editTitle,
-                description: editDescription,
-                status: editStatus,
+                title,
+                description,
+                status,
                 updated_at: now,
               }
             : i
@@ -208,171 +215,42 @@ export default function IssueList() {
           </div>
         ) : (
           issues.map((issue) => (
-            <div
+            <IssueCard
               key={issue.id}
-              className="card hover:shadow-lg transition-shadow flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
-            >
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-xs font-mono bg-gray-200 text-gray-700 rounded px-2 py-0.5">
-                    {issue.id}
-                  </span>
-                  <h3 className="text-base sm:text-lg font-semibold text-white">
-                    {issue.title}
-                  </h3>
-                </div>
-                <p className="text-gray-400 mt-1 mb-2 break-words">
-                  {issue.description}
-                </p>
-              </div>
-              <div className="flex flex-col items-end gap-2 min-w-[120px]">
-                <span
-                  className={`px-3 py-1 rounded-full text-xs font-medium ${STATUS_OPTIONS.find((s) => s.value === issue.status)?.color}`}
-                >
-                  {issue.status}
-                </span>
-                <span className="text-xs text-gray-500">
-                  Created: {new Date(issue.created_at).toLocaleDateString()}
-                </span>
-                <span className="text-xs text-gray-500">
-                  Updated:{' '}
-                  {issue.updated_at
-                    ? new Date(issue.updated_at).toLocaleDateString()
-                    : '--'}
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => openEditModal(issue)}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  <PencilSquareIcon className="h-4 w-4" />
-                </button>
-                <button
-                  onClick={() => setDeletingIssue(issue)}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  <TrashIcon className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
+              issue={issue}
+              onEdit={openEditModal}
+              onDelete={setDeletingIssue}
+            />
           ))
         )}
       </div>
-      {/* Modal 保持原样 */}
-      {showModal && (
-        <Modal>
-          <div className="modal-content card">
-            <h3 className="text-lg sm:text-xl font-semibold mb-4">
-              Add New Issue
-            </h3>
-            <input
-              className="input"
-              placeholder="Title"
-              value={newTitle}
-              onChange={(e) => setNewTitle(e.target.value)}
-              disabled={adding}
-            />
-            <textarea
-              className="input"
-              placeholder="Description"
-              value={newDescription}
-              onChange={(e) => setNewDescription(e.target.value)}
-              disabled={adding}
-            />
-            <div className="flex flex-col sm:flex-row justify-end gap-2 mt-2">
-              <button
-                onClick={() => setShowModal(false)}
-                className="btn-secondary"
-                disabled={adding}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleAddIssue}
-                className="btn-primary"
-                disabled={adding || !newTitle.trim()}
-              >
-                {adding ? 'Adding...' : 'Add'}
-              </button>
-            </div>
-          </div>
-        </Modal>
-      )}
-      {editingIssue && (
-        <Modal>
-          <div className="modal-content card">
-            <h3 className="text-lg sm:text-xl font-semibold mb-4">
-              Edit Issue
-            </h3>
-            <input
-              className="input"
-              placeholder="Title"
-              value={editTitle}
-              onChange={(e) => setEditTitle(e.target.value)}
-              disabled={editLoading}
-            />
-            <textarea
-              className="input"
-              placeholder="Description"
-              value={editDescription}
-              onChange={(e) => setEditDescription(e.target.value)}
-              disabled={editLoading}
-            />
-            <select
-              className="input"
-              value={editStatus}
-              onChange={(e) => setEditStatus(e.target.value)}
-              disabled={editLoading}
-            >
-              {STATUS_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-            <div className="flex flex-col sm:flex-row justify-end gap-2 mt-2">
-              <button
-                onClick={() => setEditingIssue(null)}
-                className="btn-secondary"
-                disabled={editLoading}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleEditSave}
-                className="btn-primary"
-                disabled={
-                  editLoading || !editTitle.trim() || !editDescription.trim()
-                }
-              >
-                {editLoading ? 'Saving...' : 'Save'}
-              </button>
-            </div>
-          </div>
-        </Modal>
-      )}
-      {deletingIssue && (
-        <Modal>
-          <div className="modal-content card">
-            <h3 className="text-lg sm:text-xl font-semibold mb-4">
-              Delete Issue
-            </h3>
-            <p>Are you sure you want to delete this issue?</p>
-            <div className="flex flex-col sm:flex-row justify-end gap-2 mt-2">
-              <button
-                onClick={() => setDeletingIssue(null)}
-                className="btn-secondary"
-              >
-                Cancel
-              </button>
-              <button onClick={handleDelete} className="btn-primary">
-                Delete
-              </button>
-            </div>
-          </div>
-        </Modal>
-      )}
+      <IssueModal
+        open={!!(showModal || editingIssue)}
+        initialTitle={editingIssue ? editTitle : newTitle}
+        initialDescription={editingIssue ? editDescription : newDescription}
+        initialStatus={editingIssue ? editStatus : 'todo'}
+        loading={adding || editLoading}
+        onSave={(title, description, status) => {
+          if (editingIssue) {
+            handleEditSave(title, description, status);
+          } else {
+            setNewTitle(title);
+            setNewDescription(description);
+            handleAddIssue();
+          }
+        }}
+        onCancel={() => {
+          setShowModal(false);
+          setEditingIssue(null);
+        }}
+        isEdit={!!editingIssue}
+      />
+      <ConfirmDeleteModal
+        open={!!deletingIssue}
+        loading={false}
+        onConfirm={handleDelete}
+        onCancel={() => setDeletingIssue(null)}
+      />
     </div>
   );
 }
