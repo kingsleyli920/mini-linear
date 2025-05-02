@@ -7,20 +7,20 @@ export async function middleware(request: NextRequest) {
     const res = NextResponse.next();
     const supabase = createMiddlewareClient({ req: request, res });
 
-    // 刷新会话
+    // Refresh session
     const {
       data: { session },
       error,
     } = await supabase.auth.getSession();
 
     if (error) {
-      console.error('中间件获取会话错误:', error);
+      console.error('Middleware failed to get session:', error);
     }
 
-    // 对于需要认证的路由
+    // For routes that require authentication
     if (request.nextUrl.pathname.startsWith('/issues')) {
       if (!session) {
-        // 未登录时重定向到登录页
+        // Redirect to login page if not logged in
         const redirectUrl = request.nextUrl.origin;
         return NextResponse.redirect(redirectUrl);
       }
@@ -28,12 +28,12 @@ export async function middleware(request: NextRequest) {
 
     return res;
   } catch (error) {
-    console.error('中间件错误:', error);
+    console.error('Middleware error:', error);
     return NextResponse.next();
   }
 }
 
-// 配置中间件匹配的路由
+// Configure routes matched by the middleware
 export const config = {
   matcher: ['/issues/:path*'],
 };
