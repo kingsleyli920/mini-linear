@@ -1,6 +1,6 @@
 'use client';
 
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import {
   HomeIcon,
@@ -12,15 +12,16 @@ import {
 } from '@heroicons/react/24/outline';
 
 const navigation = [
-  { name: '主页', icon: HomeIcon },
-  { name: '收件箱', icon: InboxIcon },
-  { name: '项目', icon: FolderIcon },
-  { name: '日历', icon: CalendarIcon },
-  { name: '报告', icon: ChartBarIcon },
+  { name: 'Home', icon: HomeIcon },
+  { name: 'Inbox', icon: InboxIcon },
+  { name: 'Projects', icon: FolderIcon },
+  { name: 'Calendar', icon: CalendarIcon },
+  { name: 'Reports', icon: ChartBarIcon },
 ];
 
-export function Sidebar() {
+export default function Sidebar() {
   const router = useRouter();
+  const supabase = createClient();
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -49,9 +50,9 @@ export function Sidebar() {
           className="group flex w-full items-center rounded-md px-2 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
         >
           <UserCircleIcon className="mr-3 h-6 w-6" />
-          退出登录
+          Sign Out
         </button>
       </div>
     </div>
   );
-} 
+}

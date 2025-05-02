@@ -1,8 +1,14 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createClient } from '@/lib/supabase/client';
 import { User } from '@supabase/supabase-js';
-import { supabase } from '@/lib/supabase';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
+} from 'react';
 
 interface AuthContextType {
   user: User | null;
@@ -14,32 +20,24 @@ const AuthContext = createContext<AuthContextType>({
   loading: true,
 });
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const supabase = createClient();
 
   useEffect(() => {
-    // 获取当前会话
-    const getUser = async () => {
-      const {
-        data: { session },
-        error,
-      } = await supabase.auth.getSession();
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
       setLoading(false);
+    });
 
-      if (error) {
-        console.error('Error getting session:', error);
-      }
-    };
-
-    getUser();
-
-    // 监听认证状态变化
+    // Listen for auth changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
+      setLoading(false);
     });
 
     return () => {

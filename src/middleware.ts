@@ -2,23 +2,38 @@ import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-export async function middleware(req: NextRequest) {
-  const res = NextResponse.next();
-  const supabase = createMiddlewareClient({ req, res });
+export async function middleware(request: NextRequest) {
+  try {
+    const res = NextResponse.next();
+    const supabase = createMiddlewareClient({ req: request, res });
 
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
+    // 刷新会话
+    const {
+      data: { session },
+      error,
+    } = await supabase.auth.getSession();
 
-  // 如果用户未登录且访问受保护的路由，重定向到登录页
-  if (!session && req.nextUrl.pathname.startsWith('/issues')) {
-    return NextResponse.redirect(new URL('/', req.url));
+    if (error) {
+      console.error('中间件获取会话错误:', error);
+    }
+
+    // 对于需要认证的路由
+    if (request.nextUrl.pathname.startsWith('/issues')) {
+      if (!session) {
+        // 未登录时重定向到登录页
+        const redirectUrl = request.nextUrl.origin;
+        return NextResponse.redirect(redirectUrl);
+      }
+    }
+
+    return res;
+  } catch (error) {
+    console.error('中间件错误:', error);
+    return NextResponse.next();
   }
-
-  // 如果用户已登录且访问登录页，重定向到issues页面
-  if (session && req.nextUrl.pathname === '/') {
-    return NextResponse.redirect(new URL('/issues', req.url));
-  }
-
-  return res;
 }
+
+// 配置中间件匹配的路由
+export const config = {
+  matcher: ['/issues/:path*'],
+};

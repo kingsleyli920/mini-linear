@@ -1,34 +1,34 @@
 'use client';
 
-import { Sidebar } from '@/components/issues/Sidebar';
-import { IssueList } from '@/components/issues/IssueList';
-import { useEffect } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import Sidebar from '@/components/issues/Sidebar';
+import IssueList from '@/components/issues/IssueList';
 import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
+import { useEffect } from 'react';
 
 export default function IssuesPage() {
+  const { user, loading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    const checkAuth = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      if (!session) {
-        router.push('/');
-      }
-    };
+    if (!loading && !user) {
+      router.push('/');
+    }
+  }, [loading, user, router]);
 
-    checkAuth();
-  }, [router]);
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!user) {
+    return null;
+  }
 
   return (
-    <div className="flex h-screen">
+    <div className="flex h-screen bg-gray-100">
       <Sidebar />
-      <main className="flex-1 overflow-auto bg-gray-50">
-        <div className="container mx-auto px-4 py-8">
-          <IssueList />
-        </div>
+      <main className="flex-1 p-8 overflow-auto">
+        <IssueList />
       </main>
     </div>
   );
