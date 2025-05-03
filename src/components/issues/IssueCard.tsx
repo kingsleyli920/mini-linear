@@ -5,6 +5,7 @@ import STATUS_OPTIONS from './statusOptions';
 
 interface Issue {
   id: number | string;
+  serial?: string;
   title: string;
   description: string;
   status: string;
@@ -26,7 +27,7 @@ export default function IssueCard({
       <div className="flex-1">
         <div className="flex items-center gap-2 mb-1">
           <span className="text-xs font-mono bg-gray-200 text-gray-700 rounded px-2 py-0.5">
-            {issue.id}
+            {issue.serial}
           </span>
           <h3 className="text-base sm:text-lg font-semibold text-white">
             {issue.title}

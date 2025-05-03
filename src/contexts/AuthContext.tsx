@@ -9,6 +9,7 @@ import {
   useState,
   ReactNode,
 } from 'react';
+import { createOrUpdateUser } from '@/services/userService';
 
 interface AuthContextType {
   user: User | null;
@@ -31,6 +32,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.log('getSession resolved', session);
       setUser(session?.user ?? null);
       setLoading(false);
+      if (session?.user) {
+        createOrUpdateUser(session.user).catch(console.error);
+      }
     });
 
     // Listen for auth changes
@@ -39,6 +43,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
       setLoading(false);
+      if (session?.user) {
+        createOrUpdateUser(session.user).catch(console.error);
+      }
     });
 
     return () => {

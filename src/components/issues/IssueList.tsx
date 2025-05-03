@@ -6,9 +6,11 @@ import { useAuth } from '@/contexts/AuthContext';
 import IssueCard from './IssueCard';
 import IssueModal from './IssueModal';
 import ConfirmDeleteModal from './ConfirmDeleteModal';
+import { v4 as uuidv4 } from 'uuid';
 
 interface Issue {
   id: number | string;
+  serial?: string;
   title: string;
   description: string;
   status: string;
@@ -67,17 +69,19 @@ export default function IssueList() {
     fetchIssues();
   }, []);
 
-  // 生成自定义 issue id
-  const generateIssueId = () => {
+  // 生成用户前缀-序号编号
+  const generateSerial = () => {
     if (!user) return '';
     const prefix = (user.user_metadata?.name || user.email || 'USR')
       .slice(0, 3)
       .toUpperCase();
-    // 找到当前用户已有的最大编号
     let maxNum = 0;
     issues.forEach((issue) => {
-      if (typeof issue.id === 'string' && issue.id.startsWith(prefix + '-')) {
-        const match = Number(issue.id.split('-')[1]);
+      if (
+        typeof issue.serial === 'string' &&
+        issue.serial.startsWith(prefix + '-')
+      ) {
+        const match = Number(issue.serial.split('-')[1]);
         if (match > maxNum) maxNum = match;
       }
     });
@@ -95,14 +99,17 @@ export default function IssueList() {
       setAdding(false);
       return;
     }
-    // 生成自定义 issue id
-    const customId = generateIssueId();
+    // 生成 uuid 作为主键 id
+    const uuid = uuidv4();
+    // 生成 serial 字段
+    const serial = generateSerial();
     const now = new Date().toISOString();
     const { data, error } = await supabase
       .from('issues')
       .insert([
         {
-          id: customId,
+          id: uuid,
+          serial,
           title: newTitle,
           description: newDescription,
           status: 'todo',
