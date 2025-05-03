@@ -1,7 +1,8 @@
-"use client";
+'use client';
 
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
 
 const ERROR_MESSAGES: Record<string, string> = {
   no_code: 'No authentication code received, please try logging in again.',
@@ -12,7 +13,7 @@ const ERROR_MESSAGES: Record<string, string> = {
   unexpected: 'An unexpected error occurred',
 };
 
-export default function AuthCodeError() {
+function AuthCodeErrorContent() {
   const searchParams = useSearchParams();
   const errorType = searchParams.get('error') || 'unexpected';
   const description = searchParams.get('description');
@@ -43,5 +44,13 @@ export default function AuthCodeError() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function AuthCodeError() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <AuthCodeErrorContent />
+    </Suspense>
   );
 }
