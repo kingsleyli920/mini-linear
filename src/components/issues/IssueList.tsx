@@ -2,9 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import Modal from '@/components/common/Modal';
 import { useAuth } from '@/contexts/AuthContext';
-import { PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline';
 import IssueCard from './IssueCard';
 import IssueModal from './IssueModal';
 import ConfirmDeleteModal from './ConfirmDeleteModal';
@@ -17,16 +15,6 @@ interface Issue {
   created_at: string;
   updated_at: string;
 }
-
-const STATUS_OPTIONS = [
-  { value: 'todo', label: 'Todo', color: 'bg-blue-100 text-blue-800' },
-  {
-    value: 'in progress',
-    label: 'In Progress',
-    color: 'bg-orange-100 text-orange-800',
-  },
-  { value: 'done', label: 'Done', color: 'bg-green-100 text-green-800' },
-];
 
 export default function IssueList() {
   const [issues, setIssues] = useState<Issue[]>([]);

@@ -28,6 +28,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('getSession resolved', session);
       setUser(session?.user ?? null);
       setLoading(false);
     });

@@ -1,3 +1,4 @@
+'use client';
 import Modal from '@/components/common/Modal';
 
 interface ConfirmDeleteModalProps {

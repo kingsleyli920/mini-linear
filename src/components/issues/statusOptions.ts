@@ -1,3 +1,4 @@
+'use client';
 const STATUS_OPTIONS = [
   { value: 'todo', label: 'Todo', color: 'bg-blue-100 text-blue-800' },
   {

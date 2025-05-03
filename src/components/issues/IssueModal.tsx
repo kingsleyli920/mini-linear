@@ -1,3 +1,5 @@
+'use client';
+
 import Modal from '@/components/common/Modal';
 import STATUS_OPTIONS from './statusOptions';
 import { useState, useEffect } from 'react';

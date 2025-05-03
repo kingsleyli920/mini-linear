@@ -1,3 +1,5 @@
+'use client';
+
 import { PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline';
 import STATUS_OPTIONS from './statusOptions';
 
