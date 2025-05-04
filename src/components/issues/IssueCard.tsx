@@ -1,7 +1,16 @@
 'use client';
 
-import { PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline';
-import STATUS_OPTIONS from './statusOptions';
+import { BarChart2, Circle, MoreHorizontal } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import {
+  StatusIcon,
+  InProgressIcon,
+  DoneIcon,
+  CanceledIcon,
+  PriorityIcon,
+  AssigneeIcon,
+  BacklogIcon,
+} from '../icons/IssueIcons';
 
 interface Issue {
   id: number | string;
@@ -11,64 +20,106 @@ interface Issue {
   status: string;
   created_at: string;
   updated_at: string;
+  priority?: string;
+  assignee?: {
+    name: string;
+    avatarUrl?: string;
+  };
 }
 
 export default function IssueCard({
   issue,
   onEdit,
   onDelete,
+  onClick,
+  index,
+  total,
 }: {
   issue: Issue;
   onEdit: (issue: Issue) => void;
   onDelete: (issue: Issue) => void;
+  onClick?: (issue: Issue, index: number, total: number) => void;
+  index?: number;
+  total?: number;
 }) {
+  const router = useRouter();
+  const priority = issue.priority || 'small';
+  const assignee = issue.assignee || null;
+  const assigneeName = assignee?.name || '';
+  const assigneeInitials = assigneeName
+    ? assigneeName
+        .split(' ')
+        .map((n) => n[0])
+        .join('')
+        .slice(0, 2)
+        .toUpperCase()
+    : '';
   return (
-    <div className="card hover:shadow-lg transition-shadow flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-      <div className="flex-1">
-        <div className="flex items-center gap-2 mb-1">
-          <span className="text-xs font-mono bg-gray-200 text-gray-700 rounded px-2 py-0.5">
-            {issue.serial}
+    <div className="flex items-center px-4 py-2 group hover:bg-[#23272e] transition-colors border-l-2 border-transparent hover:border-indigo-500 min-h-[44px] relative">
+      {/* 信号icon */}
+      <PriorityIcon priority={priority} />
+      {/* serial */}
+      <span className="text-xs font-mono text-gray-400 mr-3 shrink-0 min-w-[48px]">
+        {issue.serial}
+      </span>
+      {/* 状态圆圈 */}
+      <span className={`mr-3 shrink-0`}>
+        {issue.status === 'in progress' ? (
+          <InProgressIcon />
+        ) : issue.status === 'done' ? (
+          <DoneIcon />
+        ) : issue.status === 'canceled' ? (
+          <CanceledIcon />
+        ) : issue.status === 'backlog' ? (
+          <BacklogIcon />
+        ) : issue.status === 'duplicate' ? (
+          <CanceledIcon />
+        ) : (
+          <StatusIcon />
+        )}
+      </span>
+      {/* 标题+优先级（只在这里包裹点击事件） */}
+      <span
+        className="flex-1 flex items-center gap-2 text-[15px] text-gray-100 truncate cursor-pointer"
+        onClick={() => {
+          if (
+            onClick &&
+            typeof index === 'number' &&
+            typeof total === 'number'
+          ) {
+            onClick(issue, index, total);
+          } else {
+            router.push(`/issues/${issue.id}`);
+          }
+        }}
+      >
+        {issue.title}
+      </span>
+      {/* 右侧日期（不跳转） */}
+      <span className="text-xs text-gray-500 ml-4 min-w-[60px] text-right">
+        {issue.created_at
+          ? new Date(issue.created_at).toLocaleDateString('en-US', {
+              month: 'short',
+              day: 'numeric',
+            })
+          : ''}
+      </span>
+      {/* assignee 头像/缩写/无头像时用 AssigneeIcon */}
+      <span className="ml-4 w-7 h-7 rounded-full bg-gray-800 flex items-center justify-center text-gray-500 group-hover:shadow-lg transition-shadow">
+        {assignee && assignee.avatarUrl ? (
+          <img
+            src={assignee.avatarUrl}
+            alt={assigneeName}
+            className="w-6 h-6 rounded-full object-cover"
+          />
+        ) : assigneeInitials ? (
+          <span className="text-xs font-bold text-gray-200">
+            {assigneeInitials}
           </span>
-          <h3 className="text-base sm:text-lg font-semibold text-white">
-            {issue.title}
-          </h3>
-        </div>
-        <p className="text-gray-400 mt-1 mb-2 break-words">
-          {issue.description}
-        </p>
-      </div>
-      <div className="flex flex-col items-end gap-2 min-w-[120px]">
-        <span
-          className={`px-3 py-1 rounded-full text-xs font-medium ${
-            STATUS_OPTIONS.find((s) => s.value === issue.status)?.color
-          }`}
-        >
-          {issue.status}
-        </span>
-        <span className="text-xs text-gray-500">
-          Created: {new Date(issue.created_at).toLocaleDateString()}
-        </span>
-        <span className="text-xs text-gray-500">
-          Updated:{' '}
-          {issue.updated_at
-            ? new Date(issue.updated_at).toLocaleDateString()
-            : '--'}
-        </span>
-      </div>
-      <div className="flex items-center gap-2">
-        <button
-          onClick={() => onEdit(issue)}
-          className="text-gray-500 hover:text-gray-700"
-        >
-          <PencilSquareIcon className="h-4 w-4" />
-        </button>
-        <button
-          onClick={() => onDelete(issue)}
-          className="text-gray-500 hover:text-gray-700"
-        >
-          <TrashIcon className="h-4 w-4" />
-        </button>
-      </div>
+        ) : (
+          <AssigneeIcon />
+        )}
+      </span>
     </div>
   );
 }

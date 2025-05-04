@@ -30,16 +30,18 @@ export default function IssuesPage() {
   }
 
   return (
-    <div className="flex h-screen bg-[#f3f4f6]">
+    <div className="flex h-screen bg-[#181A20]">
       <MobileHeader onMenu={() => setSidebarOpen(true)} />
       {!isDesktop && (
-        <Sidebar mobile open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+        <Sidebar
+          mobile
+          open={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+        />
       )}
       {isDesktop && <Sidebar className="flex" />}
-      <main className="flex-1 min-h-0 h-full pt-16 sm:pt-0 p-4 sm:p-8 overflow-y-auto flex flex-col items-center bg-white">
-        <div className="w-full max-w-2xl h-full">
-          <IssueList />
-        </div>
+      <main className="flex-1 min-h-0 h-full overflow-y-auto flex flex-col bg-[#181A20] w-full">
+        <IssueList />
       </main>
     </div>
   );
