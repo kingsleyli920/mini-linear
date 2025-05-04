@@ -40,7 +40,7 @@ export default function IssuesPage() {
         />
       )}
       {isDesktop && <Sidebar className="flex" />}
-      <main className="flex-1 min-h-0 h-full overflow-y-auto flex flex-col bg-[#181A20] w-full">
+      <main className="flex-1 min-h-0 h-full overflow-y-auto flex flex-col bg-[#181A20] w-full sm:pt-0 pt-14">
         <IssueList />
       </main>
     </div>

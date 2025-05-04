@@ -29,7 +29,7 @@ export default function Modal({
         aria-label="Close modal"
       />
       <div className="absolute left-0 w-full h-full flex items-center justify-center pointer-events-none sm:left-64 sm:w-[calc(100vw-16rem)]">
-        <div className="pointer-events-auto border border-white/20 shadow-2xl bg-[#232329] rounded-2xl">
+        <div className="pointer-events-auto w-[calc(100%-24px)] mx-3 sm:w-[50%] sm:max-w-[90%] border border-white/20 shadow-2xl bg-[#232329] rounded-xl">
           {children}
         </div>
       </div>

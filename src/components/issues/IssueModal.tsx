@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import Modal from '@/components/common/Modal';
 import STATUS_OPTIONS from './statusOptions';
 import { useState, useEffect, useRef } from 'react';
@@ -75,37 +76,86 @@ export default function IssueModal({
   const [createMore, setCreateMore] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
   const statusRef = useRef<HTMLButtonElement>(null);
+  const statusMenuRef = useRef<HTMLDivElement>(null);
 
   // 重置表单
   useEffect(() => {
     if (open) {
+      console.log('Modal opened, initializing with status:', initialStatus);
       setTitle(initialTitle);
       setDescription(initialDescription);
       setStatus(initialStatus);
+      setShowStatusPicker(false); // 确保下拉菜单关闭
     }
   }, [initialTitle, initialDescription, initialStatus, open]);
+
+  // 处理状态变更
+  const handleStatusChange = (newStatus: string) => {
+    console.log('Status changing from', status, 'to', newStatus);
+
+    // 强制更新状态，确保UI立即反应变化
+    setStatus(newStatus);
+    setShowStatusPicker(false);
+
+    // 保持聚焦在状态选择器上
+    setTimeout(() => {
+      if (statusRef.current) {
+        statusRef.current.focus();
+      }
+    }, 10);
+  };
+
+  // 在状态更新时给予视觉反馈
+  useEffect(() => {
+    if (!open) return;
+
+    // 仅当modal打开且状态发生变化时记录
+    console.log('Status in modal is now:', status);
+
+    // 可以在这里添加状态更改的视觉反馈
+    if (statusRef.current) {
+      statusRef.current.classList.add('status-changed');
+      setTimeout(() => {
+        if (statusRef.current) {
+          statusRef.current.classList.remove('status-changed');
+        }
+      }, 300);
+    }
+  }, [status, open]);
 
   // 关闭下拉菜单（点击外部）
   useEffect(() => {
     function handleClick(e: MouseEvent) {
-      if (statusRef.current && !statusRef.current.contains(e.target as Node)) {
+      // 确保点击不在状态按钮或下拉菜单区域内时关闭菜单
+      if (
+        showStatusPicker &&
+        statusRef.current &&
+        statusMenuRef.current &&
+        !statusRef.current.contains(e.target as Node) &&
+        !statusMenuRef.current.contains(e.target as Node)
+      ) {
+        console.log('点击外部，关闭状态选择器');
         setShowStatusPicker(false);
       }
     }
-    if (showStatusPicker) {
-      document.addEventListener('mousedown', handleClick);
-    } else {
-      document.removeEventListener('mousedown', handleClick);
-    }
+
+    document.addEventListener('mousedown', handleClick);
     return () => document.removeEventListener('mousedown', handleClick);
   }, [showStatusPicker]);
 
   // 提交表单
-  const handleSubmit = () => {
+  const handleSubmit = (e?: React.MouseEvent) => {
+    // 确保防止默认事件行为
+    e?.preventDefault();
+
     if (!title.trim() || !description.trim()) return;
 
-    // 立即调用onSave
-    onSave(title, description, status);
+    // 确保使用的是最新状态
+    const currentStatus = status;
+    console.log('Submitting form with final status:', currentStatus);
+
+    // 立即调用onSave，确保传递最新状态
+    onSave(title, description, currentStatus);
 
     // 如果不需要创建更多，或者是编辑模式，则关闭模态框
     if (!createMore || isEdit) {
@@ -114,6 +164,11 @@ export default function IssueModal({
       // 重置表单以便创建下一个
       setTitle('');
       setDescription('');
+      // 保持当前选择的状态，不重置
+      console.log(
+        'Reset form for creating more, keeping status:',
+        currentStatus
+      );
     }
   };
 
@@ -124,7 +179,7 @@ export default function IssueModal({
     <Modal isOpen={open} onClose={onCancel}>
       <div
         ref={modalRef}
-        className="relative w-full max-w-2xl rounded-xl overflow-hidden bg-[#232329] shadow-xl"
+        className="relative w-full max-w-4xl rounded-xl overflow-hidden bg-[#232329] shadow-xl"
       >
         {/* 顶部 serial 和标题 */}
         <div className="flex items-center px-7 pt-5 pb-2 border-b border-[#23272e]">
@@ -212,9 +267,15 @@ export default function IssueModal({
             {/* Status 按钮（可下拉） */}
             <button
               ref={statusRef}
-              className={`flex items-center gap-1 px-2 py-0.5 rounded bg-[#23272e] text-[11px] font-medium border border-[#23272e] hover:border-indigo-500 transition h-6 min-w-[70px] ${showStatusPicker ? 'border-indigo-500' : ''}`}
-              onClick={() => setShowStatusPicker((v) => !v)}
+              className={`flex items-center gap-1 px-2 py-0.5 rounded bg-[#23272e] text-[11px] font-medium border ${showStatusPicker ? 'border-indigo-500' : 'border-[#23272e]'} hover:border-indigo-500 transition h-6 min-w-[70px]`}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Status button clicked, current status:', status);
+                setShowStatusPicker((v) => !v);
+              }}
               type="button"
+              title={`Current status: ${STATUS_DROPDOWN.find((s) => s.value === status)?.label || status}`}
             >
               {STATUS_DROPDOWN.find((s) => s.value === status)?.icon}
               <span
@@ -244,30 +305,42 @@ export default function IssueModal({
             {/* Status 下拉菜单 */}
             {showStatusPicker && (
               <div
-                className="fixed z-50 min-w-[160px] max-h-60 overflow-y-auto bg-[#232329] border border-[#23272e] rounded-md shadow-xl py-1 text-[11px]"
+                ref={statusMenuRef}
+                className="fixed z-[999] min-w-[160px] max-h-60 overflow-y-auto bg-[#232329] border border-[#23272e] rounded-md shadow-xl py-1 text-[11px]"
                 style={{
                   left: statusRef.current?.getBoundingClientRect().left,
                   top:
                     (statusRef.current?.getBoundingClientRect().bottom || 0) +
                     4,
+                  pointerEvents: 'auto',
                 }}
               >
                 <div className="px-3 py-1 text-gray-400 font-medium select-none text-[11px]">
                   Change status...
                 </div>
+
+                {/* 使用div元素代替button，确保点击事件不会被吞噬 */}
                 {STATUS_DROPDOWN.map((item, idx) => (
-                  <button
+                  <div
                     key={item.value}
-                    className={`flex items-center w-full px-3 py-1 gap-2 text-[11px] text-left transition
+                    data-status={item.value}
+                    className={`flex items-center w-full px-3 py-1 gap-2 text-[11px] text-left transition cursor-pointer
                       ${status === item.value ? 'bg-[#23272e] text-indigo-400' : 'text-gray-200 hover:bg-[#23272e]'}
                       ${idx === 0 ? 'rounded-t-md' : ''} ${idx === STATUS_DROPDOWN.length - 1 ? 'rounded-b-md' : ''}`}
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      console.log('直接点击处理：选择状态', item.value);
+
+                      // 立即更新状态并关闭下拉菜单
                       setStatus(item.value);
                       setShowStatusPicker(false);
                     }}
-                    type="button"
+                    style={{
+                      userSelect: 'none',
+                      WebkitUserSelect: 'none',
+                    }}
                   >
-                    {item.icon}
+                    <span className="flex-none">{item.icon}</span>
                     <span className="flex-1">{item.label}</span>
                     <span className="ml-auto text-gray-500 text-[10px]">
                       {idx + 1}
@@ -283,7 +356,7 @@ export default function IssueModal({
                         <polyline points="20 6 9 17 4 12" />
                       </svg>
                     )}
-                  </button>
+                  </div>
                 ))}
               </div>
             )}
@@ -326,7 +399,7 @@ export default function IssueModal({
               Create more
             </span>
             <button
-              onClick={handleSubmit}
+              onClick={(e) => handleSubmit(e)}
               className="px-4 py-1.5 rounded bg-indigo-600 text-white font-semibold text-[11px] shadow hover:bg-indigo-700 transition"
               disabled={loading || !title.trim() || !description.trim()}
             >

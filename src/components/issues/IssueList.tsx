@@ -80,7 +80,7 @@ export default function IssueList() {
           .from('issues')
           .select('*')
           .eq('user_id', user.id)
-          .order('created_at', { ascending: false });
+          .order('updated_at', { ascending: false });
         if (error) {
           console.error('Error fetching issues:', error);
           setIssues([]);
@@ -131,7 +131,7 @@ export default function IssueList() {
             .from('issues')
             .select('*')
             .eq('user_id', user.id)
-            .order('created_at', { ascending: false });
+            .order('updated_at', { ascending: false });
           setIssues(newData || []);
           setLoading(false);
           return;
@@ -494,15 +494,15 @@ export default function IssueList() {
       <div className="flex items-center px-4 py-2 border-b border-[#23272e] sticky top-0 z-20 bg-[#101011]">
         {/* 选项卡区域 */}
         <div className="flex items-center gap-2">
-          <button className="flex items-center gap-2 px-3 h-9 rounded-lg text-sm font-medium text-[#e2e2e2] bg-[#18181b] border border-[#23272e] focus:outline-none">
+          <button className="flex items-center gap-2 px-3 h-9 rounded-lg text-xs sm:text-sm font-medium text-[#e2e2e2] bg-[#18181b] border border-[#23272e] focus:outline-none">
             <AllIssuesIcon className="w-4 h-4" />
             All issues
           </button>
-          <button className="flex items-center gap-2 px-3 h-9 rounded-lg text-sm font-medium text-[#bdbdbd] border border-[#23272e] bg-transparent hover:bg-[#18181b]">
+          <button className="flex items-center gap-2 px-3 h-9 rounded-lg text-xs sm:text-sm font-medium text-[#bdbdbd] border border-[#23272e] bg-transparent hover:bg-[#18181b]">
             <ActiveIcon className="w-4 h-4" />
             Active
           </button>
-          <button className="flex items-center gap-2 px-3 h-9 rounded-lg text-sm font-medium text-[#bdbdbd] border border-[#23272e] bg-transparent hover:bg-[#18181b]">
+          <button className="flex items-center gap-2 px-3 h-9 rounded-lg text-xs sm:text-sm font-medium text-[#bdbdbd] border border-[#23272e] bg-transparent hover:bg-[#18181b]">
             <BacklogIcon className="w-4 h-4" />
             Backlog
           </button>
@@ -511,24 +511,26 @@ export default function IssueList() {
           </button>
         </div>
         <div className="flex-1" />
-        {/* 右侧按钮 */}
-        <button className="w-9 h-9 flex items-center justify-center rounded-lg border border-[#23272e] bg-transparent hover:bg-[#18181b] mr-2">
-          <NotificationIcon className="w-4 h-4" />
-        </button>
-        <button className="w-9 h-9 flex items-center justify-center rounded-lg border border-[#23272e] bg-transparent hover:bg-[#18181b]">
-          <LayoutIcon className="w-4 h-4" />
-        </button>
+        {/* 右侧按钮，仅在桌面模式显示 */}
+        <div className="hidden sm:flex items-center">
+          <button className="w-9 h-9 flex items-center justify-center rounded-lg border border-[#23272e] bg-transparent hover:bg-[#18181b] mr-2">
+            <NotificationIcon className="w-4 h-4" />
+          </button>
+          <button className="w-9 h-9 flex items-center justify-center rounded-lg border border-[#23272e] bg-transparent hover:bg-[#18181b]">
+            <LayoutIcon className="w-4 h-4" />
+          </button>
+        </div>
       </div>
       {/* Filter/Display 区域 */}
       <div className="flex items-center px-4 py-2 border-b border-[#23272e] bg-[#101011]">
-        <span className="flex items-center text-gray-400 text-sm font-medium mr-4">
+        <span className="flex items-center text-xs sm:text-sm font-medium text-gray-400 mr-4">
           <FilterIcon className="w-4 h-4 mr-1" />
           Filter
         </span>
         <div className="flex-1" />
-        <button className="flex items-center gap-2 px-3 h-8 rounded-lg text-sm font-medium text-[#bdbdbd] border border-[#23272e] bg-transparent hover:bg-[#18181b]">
+        <button className="flex items-center gap-2 px-3 h-8 rounded-lg text-xs sm:text-sm font-medium text-[#bdbdbd] border border-[#23272e] bg-transparent hover:bg-[#18181b]">
           <DisplayIcon className="w-4 h-4" />
-          Display
+          <span className="hidden sm:inline">Display</span>
         </button>
       </div>
       {/* 分组渲染 */}
@@ -540,13 +542,14 @@ export default function IssueList() {
         initialStatus={editingIssue ? editStatus : addStatus}
         loading={adding || editLoading}
         onSave={(title, description, status) => {
+          console.log('Modal onSave called with status:', status);
           if (editingIssue) {
             handleEditSave(title, description, status);
           } else {
             const issueData = {
               title,
               description,
-              status: status || addStatus,
+              status, // 使用用户选择的状态，不再添加备用值
             };
             console.log('Creating issue with data:', issueData);
 

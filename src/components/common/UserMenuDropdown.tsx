@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client';
 interface UserMenuDropdownProps {
   userName: string;
   userAvatarUrl?: string;
+  mobileView?: boolean;
 }
 
 const menuItems = [
@@ -18,6 +19,7 @@ const menuItems = [
 export const UserMenuDropdown: React.FC<UserMenuDropdownProps> = ({
   userName,
   userAvatarUrl,
+  mobileView = false,
 }) => {
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -44,35 +46,49 @@ export const UserMenuDropdown: React.FC<UserMenuDropdownProps> = ({
     window.location.reload();
   };
 
+  const avatarBg = userName?.[0]?.toUpperCase() || 'K';
+
   return (
     <div
-      className="user-menu-dropdown"
+      className="user-menu-dropdown flex-1 flex items-center gap-1.5"
       ref={menuRef}
-      style={{ position: 'relative', display: 'inline-block' }}
+      style={{ position: 'relative', display: 'flex' }}
     >
       <button
-        className="flex items-center bg-transparent border-none cursor-pointer px-1 py-0 rounded-md gap-1 user-menu-trigger"
+        className="flex items-center bg-transparent border-none cursor-pointer px-1 py-0 rounded-md gap-1.5 user-menu-trigger w-full"
         type="button"
         onClick={() => setOpen((v) => !v)}
       >
-        <img
-          src={userAvatarUrl || '/avatar.svg'}
-          alt="avatar"
-          className="w-5 h-5 rounded-full mr-1"
-        />
-        <span className="text-sm font-medium text-[#e2e2e2] max-w-[120px] truncate">
+        {userAvatarUrl ? (
+          <img
+            src={userAvatarUrl || '/avatar.svg'}
+            alt="avatar"
+            className="w-5 h-5 rounded mr-1"
+          />
+        ) : (
+          <div className="w-5 h-5 rounded bg-[#8a6bf6] flex items-center justify-center text-white font-semibold text-base">
+            {avatarBg}
+          </div>
+        )}
+        <span className="text-xs font-medium text-[#e2e2e2] max-w-[120px] truncate">
           {userName}
         </span>
-        <DropdownArrowIcon className="ml-0.5" />
+        <DropdownArrowIcon className="w-4 h-4 text-[#bdbdbd] ml-0.5" />
       </button>
       {open && (
-        <div className="user-menu-dropdown-list absolute left-0 mt-2 min-w-[200px] bg-[#232329] rounded-lg shadow-lg py-2 z-50">
+        <div
+          className="user-menu-dropdown-list absolute left-0 mt-2 min-w-[220px] bg-[#232329] rounded-lg shadow-lg py-2 z-[10000]"
+          style={{
+            top: '100%',
+            left: mobileView ? '8px' : '0',
+          }}
+        >
           {menuItems.map((item, idx) => (
             <button
               key={item.label}
               onClick={item.dummy ? undefined : handleLogout}
               disabled={item.dummy}
-              className={`w-full text-left px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center justify-between
+              className={`w-full text-left px-4 py-2 rounded-md text-xs font-medium transition-colors flex items-center justify-between
                 ${item.dummy ? 'text-[#bdbdbd]' : 'text-[#e2e2e2] hover:text-[#e2e2e2] hover:bg-[#23272e]'}
               `}
               style={{ cursor: item.dummy ? 'default' : 'pointer' }}
