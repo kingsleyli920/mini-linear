@@ -43,6 +43,16 @@ export default function Sidebar({
   const { user } = useAuth();
   const [customMenus, setCustomMenus] = useState<string[]>([]);
 
+  // 获取用户名首字母作为头像默认显示
+  const getUserInitial = (name?: string) => {
+    if (!name) return 'U';
+    return name.trim()[0]?.toUpperCase() || 'U';
+  };
+
+  const userInitial = getUserInitial(
+    user?.user_metadata?.name || 'kingsley-test'
+  );
+
   // 调试头像问题
   console.log('Sidebar user:', user);
   console.log('Sidebar avatar_url:', user?.user_metadata?.avatar_url);
@@ -61,19 +71,19 @@ export default function Sidebar({
     <>
       {/* 顶部用户信息区 - 桌面模式下使用UserMenuDropdown组件 */}
 
-        <div className="flex items-center gap-2 px-3 pt-3 pb-2 w-full">
-          <UserMenuDropdown
-            userName={user?.user_metadata?.name || 'kingsley-test'}
-            userAvatarUrl={user?.user_metadata?.avatar_url}
-          />
-          <div className="flex-1" />
-          <button className="w-5 h-5 flex items-center justify-center rounded-full bg-[#232329] hover:bg-[#23272e] ml-1">
-            <MagnifyingGlassIcon className="w-5 h-5 text-[#bdbdbd]" />
-          </button>
-          <button className="w-5 h-5 flex items-center justify-center rounded-full bg-[#232329] hover:bg-[#23272e] ml-1">
-            <PencilSquareIcon className="w-5 h-5 text-[#bdbdbd]" />
-          </button>
-        </div>
+      <div className="flex items-center gap-2 px-3 pt-3 pb-2 w-full">
+        <UserMenuDropdown
+          userName={user?.user_metadata?.name || 'kingsley-test'}
+          userAvatarUrl={user?.user_metadata?.avatar_url}
+        />
+        <div className="flex-1" />
+        <button className="w-5 h-5 flex items-center justify-center rounded-full bg-[#232329] hover:bg-[#23272e] ml-1">
+          <MagnifyingGlassIcon className="w-5 h-5 text-[#bdbdbd]" />
+        </button>
+        <button className="w-5 h-5 flex items-center justify-center rounded-full bg-[#232329] hover:bg-[#23272e] ml-1">
+          <PencilSquareIcon className="w-5 h-5 text-[#bdbdbd]" />
+        </button>
+      </div>
 
       {/* 菜单分组和项 */}
       <nav className="flex-1 overflow-y-auto px-0 py-2">
@@ -181,7 +191,7 @@ export default function Sidebar({
         <div className="flex flex-col gap-0.5 px-3">
           <button className="flex items-center gap-2 py-1.5 rounded-md text-sm font-medium text-[#e2e2e2] hover:bg-[#23272e] transition">
             <div className="w-5 h-5 rounded bg-[#8a6bf6] flex items-center justify-center text-white text-xs">
-              KI
+              {userInitial}
             </div>
             <span>{user?.user_metadata?.name || 'Test'}</span>
             <DropdownArrowIcon className="w-3.5 h-3.5 text-[#bdbdbd] ml-auto" />
@@ -321,9 +331,31 @@ export default function Sidebar({
             ></div>
             <div className="fixed left-0 top-0 h-full w-64 z-[9999] flex flex-col bg-[#101011] shadow-2xl">
               <div className="pt-3 pb-1 px-3 border-b border-[#23272e] flex items-center gap-2 w-full">
-                <div className="w-5 h-5 rounded bg-[#8a6bf6] flex items-center justify-center text-white font-semibold text-xs">
-                  {(user?.user_metadata?.name ||
-                    'username')[0]?.toUpperCase() || 'U'}
+                {user?.user_metadata?.avatar_url ? (
+                  <img
+                    src={user.user_metadata.avatar_url}
+                    alt={user?.user_metadata?.name || 'User'}
+                    className="w-5 h-5 rounded bg-[#8a6bf6]"
+                    onError={(e) => {
+                      const imgElement = e.currentTarget as HTMLImageElement;
+                      imgElement.style.display = 'none';
+
+                      // 使用下一个兄弟元素（就是我们的默认头像div）
+                      const nextElement =
+                        imgElement.nextElementSibling as HTMLDivElement;
+                      if (nextElement) {
+                        nextElement.style.display = 'flex';
+                      }
+                    }}
+                  />
+                ) : null}
+                <div
+                  className="w-5 h-5 rounded bg-[#8a6bf6] flex items-center justify-center text-white font-semibold text-xs"
+                  style={{
+                    display: user?.user_metadata?.avatar_url ? 'none' : 'flex',
+                  }}
+                >
+                  {userInitial}
                 </div>
                 <span className="text-xs font-medium text-[#e2e2e2]">
                   {user?.user_metadata?.name || 'kingsley-test'}

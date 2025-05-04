@@ -46,7 +46,11 @@ export const UserMenuDropdown: React.FC<UserMenuDropdownProps> = ({
     window.location.reload();
   };
 
-  const avatarBg = userName?.[0]?.toUpperCase() || 'K';
+  const getInitial = (name: string) => {
+    return name?.trim()?.[0]?.toUpperCase() || 'U';
+  };
+
+  const avatarBg = getInitial(userName);
 
   return (
     <div
@@ -61,15 +65,27 @@ export const UserMenuDropdown: React.FC<UserMenuDropdownProps> = ({
       >
         {userAvatarUrl ? (
           <img
-            src={userAvatarUrl || '/avatar.svg'}
-            alt="avatar"
+            src={userAvatarUrl}
+            alt={userName}
             className="w-5 h-5 rounded mr-1"
+            onError={(e) => {
+              const imgElement = e.currentTarget as HTMLImageElement;
+              imgElement.style.display = 'none';
+
+              const nextElement =
+                imgElement.nextElementSibling as HTMLDivElement;
+              if (nextElement) {
+                nextElement.style.display = 'flex';
+              }
+            }}
           />
-        ) : (
-          <div className="w-5 h-5 rounded bg-[#8a6bf6] flex items-center justify-center text-white font-semibold text-base">
-            {avatarBg}
-          </div>
-        )}
+        ) : null}
+        <div
+          className="w-5 h-5 rounded bg-[#8a6bf6] flex items-center justify-center text-white font-semibold text-xs"
+          style={{ display: userAvatarUrl ? 'none' : 'flex' }}
+        >
+          {avatarBg}
+        </div>
         <span className="text-xs font-medium text-[#e2e2e2] max-w-[120px] truncate">
           {userName}
         </span>

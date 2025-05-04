@@ -8,7 +8,7 @@ interface IssueTitleProps {
 export default function IssueTitle({ title, onClick }: IssueTitleProps) {
   return (
     <span
-      className="flex-1 flex items-center gap-2 text-xs text-gray-100 truncate cursor-pointer"
+      className="flex-1 flex items-center gap-2 text-xs text-gray-100 truncate"
       onClick={onClick}
     >
       {title}

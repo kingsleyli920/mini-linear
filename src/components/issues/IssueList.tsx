@@ -427,9 +427,15 @@ export default function IssueList() {
                       index={globalIndex}
                       total={globalList.length}
                       onClick={(issue, index, total) => {
-                        router.push(
-                          `/issues/${issue.id}?index=${index}&total=${total}`
+                        // 临时禁用跳转功能
+                        console.log(
+                          '点击issue卡片，但跳转已禁用:',
+                          issue.id,
+                          index,
+                          total
                         );
+                        // 如果需要恢复，取消注释以下代码
+                        // router.push(`/issues/${issue.id}?index=${index}&total=${total}`);
                       }}
                     />
                   </div>
@@ -472,9 +478,15 @@ export default function IssueList() {
                         index={globalIndex}
                         total={globalList.length}
                         onClick={(issue, index, total) => {
-                          router.push(
-                            `/issues/${issue.id}?index=${index}&total=${total}`
+                          // 临时禁用跳转功能
+                          console.log(
+                            '点击issue卡片，但跳转已禁用:',
+                            issue.id,
+                            index,
+                            total
                           );
+                          // 如果需要恢复，取消注释以下代码
+                          // router.push(`/issues/${issue.id}?index=${index}&total=${total}`);
                         }}
                       />
                     </div>

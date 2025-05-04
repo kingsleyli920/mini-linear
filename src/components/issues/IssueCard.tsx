@@ -57,11 +57,17 @@ export default function IssueCard({
 
   // 处理标题点击
   const handleTitleClick = () => {
+    // 临时禁用跳转到issue details的功能
+    console.log('点击标题，但跳转功能已暂时禁用:', issue.id);
+
+    // 如果将来需要恢复，取消注释下面的代码
+    /*
     if (onClick && typeof index === 'number' && typeof total === 'number') {
       onClick(issue, index, total);
     } else {
       router.push(`/issues/${issue.id}`);
     }
+    */
   };
 
   return (

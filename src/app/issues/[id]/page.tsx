@@ -13,7 +13,6 @@ import Sidebar from '@/components/common/Sidebar';
 import IssueProperties from '@/components/issues/IssueProperties';
 import IssueDetailHeaderLeft from '@/components/issues/IssueDetailHeaderLeft';
 import IssueDetailHeaderRight from '@/components/issues/IssueDetailHeaderRight';
-import { MOCK_ISSUES } from '@/components/issues/constants';
 
 export default function IssueDetailPage() {
   const params = useParams();
@@ -29,12 +28,7 @@ export default function IssueDetailPage() {
     assignee: { name: 'Linear', avatarUrl: '' },
     priority: 'medium',
   };
-  // 用 MOCK_ISSUES 查找当前 issue 的 index 和 total
-  const globalList = MOCK_ISSUES;
-  const currentIndex = globalList.findIndex(
-    (issue) => String(issue.id) === String(issueId)
-  );
-  const total = globalList.length;
+
   return (
     <div className="flex h-screen w-full bg-[#101011] text-gray-100">
       {/* 左侧 Sidebar */}
@@ -46,14 +40,14 @@ export default function IssueDetailPage() {
           {/* 顶部导航栏（面包屑+编号+右侧操作+计数/箭头） */}
           <div className="flex items-center px-8 py-4 border-b border-[#18181b] bg-[#101011] sticky top-0 z-20">
             <IssueDetailHeaderLeft issue={issue} />
-            <div className="ml-auto">
+            {/* <div className="ml-auto">
               <IssueDetailHeaderRight
                 currentIndex={currentIndex}
                 total={total}
                 onPrev={() => {}}
                 onNext={() => {}}
               />
-            </div>
+            </div> */}
           </div>
           {/* 主内容区 */}
           <div className="max-w-3xl mx-auto py-8 px-6">
