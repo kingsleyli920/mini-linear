@@ -16,6 +16,8 @@ import {
 import { useAuth } from '@/contexts/AuthContext';
 import { useState } from 'react';
 import React from 'react';
+import { DropdownArrowIcon } from '../icons/IssueIcons';
+import { UserMenuDropdown } from './UserMenuDropdown';
 
 const navigation = [
   { name: 'Home', icon: HomeIcon },
@@ -41,6 +43,10 @@ export default function Sidebar({
   const { user } = useAuth();
   const [customMenus, setCustomMenus] = useState<string[]>([]);
 
+  // 调试头像问题
+  console.log('Sidebar user:', user);
+  console.log('Sidebar avatar_url:', user?.user_metadata?.avatar_url);
+
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     router.push('/');
@@ -63,13 +69,10 @@ export default function Sidebar({
             <div className="fixed left-0 top-0 h-full w-64 z-[9999] flex flex-col bg-[#101011] shadow-2xl animate-slide-in">
               {/* 顶部用户信息区 */}
               <div className="flex items-center gap-2 px-3 pt-3 pb-2">
-                <div className="w-5 h-5 rounded bg-[#a78bfa] flex items-center justify-center text-xs font-bold text-white">
-                  KI
-                </div>
-                <span className="text-xs font-medium text-[#e2e2e2]">
-                  kingsley-test
-                </span>
-                <ChevronDownIcon className="w-4 h-4 text-[#bdbdbd] ml-1" />
+                <UserMenuDropdown
+                  userName={user?.user_metadata?.name || user?.email || 'User'}
+                  userAvatarUrl={user?.user_metadata?.avatar_url}
+                />
                 <div className="flex-1" />
                 <button className="w-8 h-8 flex items-center justify-center rounded bg-[#232329] hover:bg-[#23272e] ml-1">
                   <MagnifyingGlassIcon className="w-5 h-5 text-[#bdbdbd]" />
@@ -165,13 +168,10 @@ export default function Sidebar({
     <div className="hidden sm:flex sm:w-64 w-0 flex-col bg-[#101011] h-full">
       {/* 顶部用户信息区 */}
       <div className="flex items-center gap-2 px-3 pt-3 pb-2">
-        <div className="w-7 h-7 rounded bg-[#a78bfa] flex items-center justify-center text-xs font-bold text-white">
-          KI
-        </div>
-        <span className="text-sm font-medium text-[#e2e2e2]">
-          kingsley-test
-        </span>
-        <ChevronDownIcon className="w-4 h-4 text-[#bdbdbd] ml-1" />
+        <UserMenuDropdown
+          userName={user?.user_metadata?.name || user?.email || 'User'}
+          userAvatarUrl={user?.user_metadata?.avatar_url}
+        />
         <div className="flex-1" />
         <button className="w-8 h-8 flex items-center justify-center rounded bg-[#232329] hover:bg-[#23272e] ml-1">
           <MagnifyingGlassIcon className="w-5 h-5 text-[#bdbdbd]" />
@@ -260,7 +260,7 @@ export default function Sidebar({
               />
             </svg>
             Kingsley-test
-            <ChevronDownIcon className="w-4 h-4 text-[#bdbdbd] ml-auto" />
+            <DropdownArrowIcon className="w-4 h-4 text-[#bdbdbd] ml-auto" />
           </button>
           <button className="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium text-[#e2e2e2] bg-[#23272e] mt-1">
             <svg

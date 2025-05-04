@@ -9,7 +9,7 @@ import {
   Circle,
   ChevronRight,
 } from 'lucide-react';
-import Sidebar from '@/components/issues/Sidebar';
+import Sidebar from '@/components/common/Sidebar';
 import IssueProperties from '@/components/issues/IssueProperties';
 import IssueDetailHeaderLeft from '@/components/issues/IssueDetailHeaderLeft';
 import IssueDetailHeaderRight from '@/components/issues/IssueDetailHeaderRight';

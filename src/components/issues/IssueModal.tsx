@@ -71,43 +71,61 @@ export default function IssueModal({
   const [title, setTitle] = useState(initialTitle);
   const [description, setDescription] = useState(initialDescription);
   const [status, setStatus] = useState(initialStatus);
-  const [statusDropdown, setStatusDropdown] = useState(false);
-  const statusBtnRef = useRef<HTMLButtonElement>(null);
+  const [showStatusPicker, setShowStatusPicker] = useState(false);
   const [createMore, setCreateMore] = useState(false);
+  const modalRef = useRef<HTMLDivElement>(null);
+  const statusRef = useRef<HTMLButtonElement>(null);
 
+  // 重置表单
   useEffect(() => {
     if (open) {
       setTitle(initialTitle);
       setDescription(initialDescription);
       setStatus(initialStatus);
-      setStatusDropdown(false);
     }
-  }, [open, initialTitle, initialDescription, initialStatus]);
+  }, [initialTitle, initialDescription, initialStatus, open]);
 
   // 关闭下拉菜单（点击外部）
   useEffect(() => {
     function handleClick(e: MouseEvent) {
-      if (
-        statusBtnRef.current &&
-        !statusBtnRef.current.contains(e.target as Node)
-      ) {
-        setStatusDropdown(false);
+      if (statusRef.current && !statusRef.current.contains(e.target as Node)) {
+        setShowStatusPicker(false);
       }
     }
-    if (statusDropdown) {
+    if (showStatusPicker) {
       document.addEventListener('mousedown', handleClick);
     } else {
       document.removeEventListener('mousedown', handleClick);
     }
     return () => document.removeEventListener('mousedown', handleClick);
-  }, [statusDropdown]);
+  }, [showStatusPicker]);
+
+  // 提交表单
+  const handleSubmit = () => {
+    if (!title.trim() || !description.trim()) return;
+
+    // 立即调用onSave
+    onSave(title, description, status);
+
+    // 如果不需要创建更多，或者是编辑模式，则关闭模态框
+    if (!createMore || isEdit) {
+      onCancel();
+    } else {
+      // 重置表单以便创建下一个
+      setTitle('');
+      setDescription('');
+    }
+  };
 
   if (!open) return null;
   // 顶部标签内容
   const projectName = 'KIN'; // TODO: 动态获取
   return (
-    <Modal>
-      <div className="bg-[#232329] rounded-xl shadow-xl border-2 border-[#23272e] outline outline-1 outline-[#23272e] w-[700px] max-w-[90vw] min-h-[220px] mx-auto p-0">
+    <Modal isOpen={open} onClose={onCancel}>
+      <div
+        ref={modalRef}
+        className="relative w-full max-w-2xl rounded-xl overflow-hidden bg-[#232329] shadow-xl"
+      >
         {/* 顶部 serial 和标题 */}
         <div className="flex items-center px-7 pt-5 pb-2 border-b border-[#23272e]">
           <span className="flex items-center text-xs font-mono bg-[#23272e] rounded px-2 py-1 mr-2 gap-1">
@@ -193,9 +211,9 @@ export default function IssueModal({
           <div className="flex items-center gap-1.5 mb-2 relative">
             {/* Status 按钮（可下拉） */}
             <button
-              ref={statusBtnRef}
-              className={`flex items-center gap-1 px-2 py-0.5 rounded bg-[#23272e] text-[11px] font-medium border border-[#23272e] hover:border-indigo-500 transition h-6 min-w-[70px] ${statusDropdown ? 'border-indigo-500' : ''}`}
-              onClick={() => setStatusDropdown((v) => !v)}
+              ref={statusRef}
+              className={`flex items-center gap-1 px-2 py-0.5 rounded bg-[#23272e] text-[11px] font-medium border border-[#23272e] hover:border-indigo-500 transition h-6 min-w-[70px] ${showStatusPicker ? 'border-indigo-500' : ''}`}
+              onClick={() => setShowStatusPicker((v) => !v)}
               type="button"
             >
               {STATUS_DROPDOWN.find((s) => s.value === status)?.icon}
@@ -224,14 +242,14 @@ export default function IssueModal({
               </svg>
             </button>
             {/* Status 下拉菜单 */}
-            {statusDropdown && (
+            {showStatusPicker && (
               <div
                 className="fixed z-50 min-w-[160px] max-h-60 overflow-y-auto bg-[#232329] border border-[#23272e] rounded-md shadow-xl py-1 text-[11px]"
                 style={{
-                  left: statusBtnRef.current?.getBoundingClientRect().left,
+                  left: statusRef.current?.getBoundingClientRect().left,
                   top:
-                    (statusBtnRef.current?.getBoundingClientRect().bottom ||
-                      0) + 4,
+                    (statusRef.current?.getBoundingClientRect().bottom || 0) +
+                    4,
                 }}
               >
                 <div className="px-3 py-1 text-gray-400 font-medium select-none text-[11px]">
@@ -245,7 +263,7 @@ export default function IssueModal({
                       ${idx === 0 ? 'rounded-t-md' : ''} ${idx === STATUS_DROPDOWN.length - 1 ? 'rounded-b-md' : ''}`}
                     onClick={() => {
                       setStatus(item.value);
-                      setStatusDropdown(false);
+                      setShowStatusPicker(false);
                     }}
                     type="button"
                   >
@@ -308,11 +326,15 @@ export default function IssueModal({
               Create more
             </span>
             <button
-              onClick={() => onSave(title, description, status)}
+              onClick={handleSubmit}
               className="px-4 py-1.5 rounded bg-indigo-600 text-white font-semibold text-[11px] shadow hover:bg-indigo-700 transition"
               disabled={loading || !title.trim() || !description.trim()}
             >
-              {loading ? 'Creating...' : 'Create issue'}
+              {loading
+                ? 'Creating...'
+                : isEdit
+                  ? 'Save changes'
+                  : 'Create issue'}
             </button>
           </div>
         </div>

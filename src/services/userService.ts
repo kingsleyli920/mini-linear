@@ -26,6 +26,7 @@ export async function createOrUpdateUser(user: User): Promise<DBUser> {
       user.user_metadata.full_name || user.email?.split('@')[0] || 'Anonymous',
     avatar_url: user.user_metadata.avatar_url || '',
     created_at: new Date().toISOString(),
+    email: user.email,
   };
   const { data, error } = await supabase
     .from('users')

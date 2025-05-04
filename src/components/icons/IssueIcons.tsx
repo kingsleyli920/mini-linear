@@ -37,14 +37,7 @@ export function StatusIcon(props: React.SVGProps<SVGSVGElement>) {
 }
 
 export function PriorityIcon({ priority }: { priority: string }) {
-  let fill = '#bdbdbd',
-    fill2 = '#bdbdbd',
-    fill3 = '#bdbdbd',
-    op2 = 0.4,
-    op3 = 0.4;
-  if (priority === 'high') fill = '#b94a48';
-  if (priority === 'medium') fill = '#bfa94a';
-  if (priority === 'low') fill = '#bdbdbd';
+  // 所有格子都灰色
   return (
     <svg
       width="18"
@@ -53,15 +46,15 @@ export function PriorityIcon({ priority }: { priority: string }) {
       fill="none"
       aria-hidden="true"
     >
-      <rect x="1.5" y="8" width="3" height="6" rx="1" fill={fill} />
+      <rect x="1.5" y="8" width="3" height="6" rx="1" fill="#bdbdbd" />
       <rect
         x="6.5"
         y="5"
         width="3"
         height="9"
         rx="1"
-        fill={fill2}
-        fillOpacity={op2}
+        fill="#bdbdbd"
+        fillOpacity={0.4}
       />
       <rect
         x="11.5"
@@ -69,8 +62,8 @@ export function PriorityIcon({ priority }: { priority: string }) {
         width="3"
         height="12"
         rx="1"
-        fill={fill3}
-        fillOpacity={op3}
+        fill="#bdbdbd"
+        fillOpacity={0.4}
       />
     </svg>
   );
@@ -423,6 +416,39 @@ export function PlusIcon(props: React.SVGProps<SVGSVGElement>) {
     >
       <line x1="12" y1="5" x2="12" y2="19" />
       <line x1="5" y1="12" x2="19" y2="12" />
+    </svg>
+  );
+}
+
+export const DropdownArrowIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" {...props}>
+    <path
+      d="M4.5 6l3.5 4 3.5-4"
+      stroke="#bdbdbd"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+export function LinkIcon(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <path
+        d="M6.5 9.5L9.5 6.5M7.5 4.5H4.5C3.39543 4.5 2.5 5.39543 2.5 6.5V11.5C2.5 12.6046 3.39543 13.5 4.5 13.5H9.5C10.6046 13.5 11.5 12.6046 11.5 11.5V8.5M8.5 2.5H13.5V7.5"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }
