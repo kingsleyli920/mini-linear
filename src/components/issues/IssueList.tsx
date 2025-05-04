@@ -234,14 +234,14 @@ export default function IssueList() {
         {/* Todo 分组永远显示 */}
         <div className="mb-2">
           <div className="flex items-center px-4 py-2 bg-[#18181b] sticky top-0 z-10">
-            <span className="text-gray-200 font-semibold text-[15px] flex-1 tracking-tight flex items-center gap-2">
+            <span className="text-gray-200 font-semibold text-sm flex-1 tracking-tight flex items-center gap-2">
               {todoGroup.key === 'in progress' ? (
                 <InProgressIcon className="w-4 h-4 mr-1 align-middle" />
               ) : (
                 <StatusIcon className="w-4 h-4" />
               )}
               {todoGroup.label}
-              <span className="ml-2 text-xs text-gray-500 font-normal">
+              <span className="ml-2 text-[11px] text-gray-500 font-normal">
                 {todoIssues.length}
               </span>
             </span>
@@ -296,7 +296,7 @@ export default function IssueList() {
               className={idx !== otherGroups.length - 1 ? 'mb-2' : ''}
             >
               <div className="flex items-center px-4 py-2 bg-[#18181b] sticky top-0 z-10">
-                <span className="text-gray-200 font-semibold text-[15px] flex-1 tracking-tight flex items-center gap-2">
+                <span className="text-gray-200 font-semibold text-sm flex-1 tracking-tight flex items-center gap-2">
                   {group.key === 'in progress' && (
                     <InProgressIcon className="w-4 h-4 mr-1 align-middle" />
                   )}
@@ -312,7 +312,7 @@ export default function IssueList() {
                     <CanceledIcon className="w-4 h-4" />
                   )}
                   {group.label}
-                  <span className="ml-2 text-xs text-gray-500 font-normal">
+                  <span className="ml-2 text-[11px] text-gray-500 font-normal">
                     {groupIssues.length}
                   </span>
                 </span>

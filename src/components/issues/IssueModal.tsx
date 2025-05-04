@@ -117,9 +117,7 @@ export default function IssueModal({
             </span>
             <ChevronRight className="w-3 h-3 text-gray-500 mx-1" />
           </span>
-          <span className="text-gray-300 text-base font-semibold">
-            New issue
-          </span>
+          <span className="text-gray-300 text-sm font-semibold">New issue</span>
           {/* 最大化按钮+Tooltip */}
           <div className="relative group ml-auto">
             <button
@@ -177,7 +175,7 @@ export default function IssueModal({
         {/* 内容区 */}
         <div className="px-7 pt-6 pb-2">
           <input
-            className="w-full bg-transparent text-lg font-semibold text-gray-200 placeholder-gray-500 outline-none border-none mb-2 leading-tight"
+            className="w-full bg-transparent text-sm font-semibold text-gray-200 placeholder-gray-500 outline-none border-none mb-2 leading-tight"
             placeholder="Issue title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
@@ -185,7 +183,7 @@ export default function IssueModal({
             style={{ letterSpacing: '-0.5px' }}
           />
           <textarea
-            className="w-full bg-transparent text-sm text-gray-400 placeholder-gray-500 outline-none border-none resize-none mb-3 min-h-[28px] leading-snug"
+            className="w-full bg-transparent text-xs text-gray-400 placeholder-gray-500 outline-none border-none resize-none mb-3 min-h-[28px] leading-snug"
             placeholder="Add description..."
             value={description}
             onChange={(e) => setDescription(e.target.value)}
@@ -196,7 +194,7 @@ export default function IssueModal({
             {/* Status 按钮（可下拉） */}
             <button
               ref={statusBtnRef}
-              className={`flex items-center gap-1 px-2 py-0.5 rounded bg-[#23272e] text-xs font-medium border border-[#23272e] hover:border-indigo-500 transition h-6 min-w-[70px] ${statusDropdown ? 'border-indigo-500' : ''}`}
+              className={`flex items-center gap-1 px-2 py-0.5 rounded bg-[#23272e] text-[11px] font-medium border border-[#23272e] hover:border-indigo-500 transition h-6 min-w-[70px] ${statusDropdown ? 'border-indigo-500' : ''}`}
               onClick={() => setStatusDropdown((v) => !v)}
               type="button"
             >
@@ -228,7 +226,7 @@ export default function IssueModal({
             {/* Status 下拉菜单 */}
             {statusDropdown && (
               <div
-                className="fixed z-50 min-w-[160px] max-h-60 overflow-y-auto bg-[#232329] border border-[#23272e] rounded-md shadow-xl py-1 text-xs"
+                className="fixed z-50 min-w-[160px] max-h-60 overflow-y-auto bg-[#232329] border border-[#23272e] rounded-md shadow-xl py-1 text-[11px]"
                 style={{
                   left: statusBtnRef.current?.getBoundingClientRect().left,
                   top:
@@ -236,13 +234,13 @@ export default function IssueModal({
                       0) + 4,
                 }}
               >
-                <div className="px-3 py-1 text-gray-400 font-medium select-none">
+                <div className="px-3 py-1 text-gray-400 font-medium select-none text-[11px]">
                   Change status...
                 </div>
                 {STATUS_DROPDOWN.map((item, idx) => (
                   <button
                     key={item.value}
-                    className={`flex items-center w-full px-3 py-1 gap-2 text-xs text-left transition
+                    className={`flex items-center w-full px-3 py-1 gap-2 text-[11px] text-left transition
                       ${status === item.value ? 'bg-[#23272e] text-indigo-400' : 'text-gray-200 hover:bg-[#23272e]'}
                       ${idx === 0 ? 'rounded-t-md' : ''} ${idx === STATUS_DROPDOWN.length - 1 ? 'rounded-b-md' : ''}`}
                     onClick={() => {
@@ -306,12 +304,12 @@ export default function IssueModal({
                 className={`${createMore ? 'translate-x-4' : 'translate-x-1'} inline-block h-2.5 w-2.5 transform rounded-full bg-white transition`}
               />
             </Switch>
-            <span className="text-xs text-gray-400 select-none">
+            <span className="text-[11px] text-gray-400 select-none">
               Create more
             </span>
             <button
               onClick={() => onSave(title, description, status)}
-              className="px-4 py-1.5 rounded bg-indigo-600 text-white font-semibold text-xs shadow hover:bg-indigo-700 transition"
+              className="px-4 py-1.5 rounded bg-indigo-600 text-white font-semibold text-[11px] shadow hover:bg-indigo-700 transition"
               disabled={loading || !title.trim() || !description.trim()}
             >
               {loading ? 'Creating...' : 'Create issue'}

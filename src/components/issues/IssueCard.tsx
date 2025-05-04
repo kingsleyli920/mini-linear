@@ -80,7 +80,7 @@ export default function IssueCard({
       </span>
       {/* 标题+优先级（只在这里包裹点击事件） */}
       <span
-        className="flex-1 flex items-center gap-2 text-[15px] text-gray-100 truncate cursor-pointer"
+        className="flex-1 flex items-center gap-2 text-xs text-gray-100 truncate cursor-pointer"
         onClick={() => {
           if (
             onClick &&
